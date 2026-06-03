@@ -5,6 +5,12 @@ using namespace std;
 
 int main() {
 
-  RubiksCube3dArray *rubiksCube3d = new RubiksCube3dArray();
-  rubiksCube3d->print();
+  RubiksCube3dArray cube;
+
+  auto moves = cube.randomShuffleCube(3);
+  for (auto mov : moves) {
+    cout << cube.getMove(mov) << " ";
+  }
+
+  cube.print();
 }

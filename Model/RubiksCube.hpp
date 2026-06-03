@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <vector>
 using namespace std;
 
 /*
@@ -11,7 +12,7 @@ shared common functionality between models
 class RubiksCube {
 
 public:
-  enum class FACE { FRONT, BACK, RIGHT, LEFT, UP, DOWN };
+  enum class FACE { UP, LEFT, FRONT, RIGHT, BACK, DOWN };
   enum class COLOR { WHITE, GREEN, RED, BLUE, ORANGE, YELLOW };
   enum class MOVE {
     L,
