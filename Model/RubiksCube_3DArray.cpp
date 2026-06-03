@@ -1,4 +1,4 @@
-#include "RubiksCube.hpp" /*                                                                         |
+#include "RubiksCube.hpp" /*                                                                         
 | -------------------------------------------------------------------------- |
 | 3D Array Representation of the Rubik's Cube                                |
 | -------------------------------------------------------------------------- |
@@ -23,7 +23,7 @@
 | implementation to ensure correctness of all cube rotations                 |
 | and transformations.                                                       |
 |                                                                            |
-| */ |
+| */
 
 class RubiksCube3dArray : public RubiksCube {
 
