@@ -26,9 +26,9 @@ void NibbleArray::set(const size_t pos, const uint8_t val) {
   assert(pos <= this->size);
 
   if (pos % 2) {
-    this->arr.at(i) = (currval & 0xF0) | (val & 0xF0);
+    this->arr.at(i) = (currval & 0xF0) | (val & 0x0F);
   } else {
-    this->arr.at(i) = (currval & 0xF0) | (val << 4);
+    this->arr.at(i) = (currval & 0x0F) | (val << 4);
   }
 }
 
