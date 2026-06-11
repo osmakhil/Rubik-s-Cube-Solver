@@ -11,7 +11,6 @@ CornerDBmaker::CornerDBmaker(string _fileName, uint8_t init_val)
 
 bool CornerDBmaker::bfsAndStore()
 {
-  // Load from file if already built
   if (cornerDB.fromFile(fileName))
   {
     cout << "Loaded corner DB from file: " << fileName << "\n";
@@ -21,10 +20,8 @@ bool CornerDBmaker::bfsAndStore()
   RubiksCubeBitboard solvedCube;
   cornerDB.setNumMoves(solvedCube, 0);
 
-  // KEY CHANGE: frontier only holds current + next level
-  // NOT a queue of full cube objects across all depths
-  vector<RubiksCubeBitboard> currentLevel, nextLevel;
-  currentLevel.push_back(solvedCube);
+  vector<pair<RubiksCubeBitboard, int8_t>> currentLevel, nextLevel;
+  currentLevel.push_back({solvedCube, -1});
 
   uint8_t targetDepth = 11;
 
@@ -38,23 +35,21 @@ bool CornerDBmaker::bfsAndStore()
 
     // Reserve to avoid repeated heap reallocations
     nextLevel.clear();
-    nextLevel.reserve(currentLevel.size() * 6);
+    nextLevel.reserve(currentLevel.size() * 13);
 
-    for (auto &cube : currentLevel)
+    for (auto &[cube, lastMove] : currentLevel)
     {
       for (int i = 0; i < 18; i++)
       {
-        auto move = RubiksCube::MOVE(i);
+        // Pruning: skip if same face group as last move
+        if (lastMove != -1 && (i / 3 == lastMove / 3))
+          continue;
 
-        RubiksCubeBitboard next = cube; // copy
-        next.move(move);
+        RubiksCubeBitboard next = cube;
+        next.move(RubiksCube::MOVE(i));
 
-        // setNumMoves returns true only if this is a NEW state
-        // (0xFF unvisited) — no duplicates pushed
         if (cornerDB.setNumMoves(next, depth + 1))
-        {
-          nextLevel.push_back(next);
-        }
+          nextLevel.push_back({next, i});
       }
     }
 
