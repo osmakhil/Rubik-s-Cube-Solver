@@ -2,6 +2,10 @@
 #include <iostream>
 #include <vector>
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 using namespace std;
 
 CornerDBmaker::CornerDBmaker(string _fileName) : fileName(_fileName) {}
@@ -33,17 +37,30 @@ bool CornerDBmaker::bfsAndStore() {
     nextLevel.clear();
     nextLevel.reserve(currentLevel.size() * 13);
 
-    for (auto &[cube, lastMove] : currentLevel) {
-      for (int i = 0; i < 18; i++) {
-        // Pruning: skip if same face group as last move
-        if (lastMove != -1 && (i / 3 == lastMove / 3))
-          continue;
+#pragma omp parallel
+    {
+      vector<pair<RubiksCubeBitboard, int8_t>> localNextLevel;
 
-        RubiksCubeBitboard next = cube;
-        next.move(RubiksCube::MOVE(i));
+#pragma omp for nowait
+      for (size_t idx = 0; idx < currentLevel.size(); ++idx) {
+        auto &[cube, lastMove] = currentLevel[idx];
+        for (int i = 0; i < 18; i++) {
+          // Pruning: skip if same face group as last move
+          if (lastMove != -1 && (i / 3 == lastMove / 3))
+            continue;
 
-        if (cornerDB.setNumMoves(next, depth + 1))
-          nextLevel.push_back({next, i});
+          RubiksCubeBitboard next = cube;
+          next.move(RubiksCube::MOVE(i));
+
+          if (cornerDB.setNumMoves(next, depth + 1))
+            localNextLevel.push_back({next, i});
+        }
+      }
+
+#pragma omp critical
+      {
+        nextLevel.insert(nextLevel.end(), localNextLevel.begin(),
+                         localNextLevel.end());
       }
     }
 

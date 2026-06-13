@@ -4,6 +4,7 @@
 #include <vector>
 // #include "../Model/PatternDatabase/PatternDatabase.h"
 #include "../PatternDatabase/CornerPatternDatabase.hpp"
+#include "../PatternDatabase/EdgePatternDatabase.hpp"
 
 #ifndef RUBIKS_CUBE_SOLVER_IDASTARSOLVER_H
 #define RUBIKS_CUBE_SOLVER_IDASTARSOLVER_H
@@ -11,6 +12,9 @@
 template <typename T, typename H> class IDAstarSolver {
 private:
   CornerPatternDatabase cornerDB;
+  EdgePatternDatabase edgeDB1;
+  EdgePatternDatabase edgeDB2;
+
   vector<RubiksCube::MOVE> moves;
   unordered_map<T, RubiksCube::MOVE, H> move_done;
   unordered_map<T, bool, H> visited;
@@ -43,7 +47,8 @@ private:
 public:
   T rubiksCube;
 
-  IDAstarSolver(T _rubiksCube, string fileName);
+  IDAstarSolver(T _rubiksCube, string cornerDatabasePath,
+                string edgeDatabasePath1, string edgeDatabasePath2);
 
   vector<RubiksCube::MOVE> solve();
 };

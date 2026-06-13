@@ -182,8 +182,8 @@ void RubiksCubeBitboard::rotateFace(int ind) {
   bitboard[ind] = (bitboard[ind] << (8 * 2)) | (side);
 }
 
-void RubiksCubeBitboard::rotateSide(int dstFace, int dst1, int dst2, int dst3, int srcFace,
-                                    int src1, int src2, int src3) {
+void RubiksCubeBitboard::rotateSide(int dstFace, int dst1, int dst2, int dst3,
+                                    int srcFace, int src1, int src2, int src3) {
 
   uint64_t clr1 = (bitboard[srcFace] & (one_8 << (8 * src1))) >> (8 * src1);
   uint64_t clr2 = (bitboard[srcFace] & (one_8 << (8 * src2))) >> (8 * src2);
@@ -244,7 +244,8 @@ RubiksCubeBitboard::RubiksCubeBitboard() {
   }
 }
 
-RubiksCube::COLOR RubiksCubeBitboard::getColor(FACE face, unsigned row, unsigned col) const {
+RubiksCube::COLOR RubiksCubeBitboard::getColor(FACE face, unsigned row,
+                                               unsigned col) const {
   int idx = arr[row][col];
   if (idx == 8)
     return (COLOR)((int)face);
@@ -366,10 +367,10 @@ RubiksCube &RubiksCubeBitboard::r() {
 
   this->rotateSide(0, 2, 3, 4, 2, 2, 3, 4);
   this->rotateSide(2, 2, 3, 4, 5, 2, 3, 4);
-  this->rotateSide(5, 2, 3, 4, 4, 7, 6, 0);
+  this->rotateSide(5, 2, 3, 4, 4, 6, 7, 0);
 
-  bitboard[4] = (bitboard[4] & ~(one_8 << (8 * 7))) | (clr1 << (8 * 7));
-  bitboard[4] = (bitboard[4] & ~(one_8 << (8 * 6))) | (clr2 << (8 * 6));
+  bitboard[4] = (bitboard[4] & ~(one_8 << (8 * 6))) | (clr1 << (8 * 6));
+  bitboard[4] = (bitboard[4] & ~(one_8 << (8 * 7))) | (clr2 << (8 * 7));
   bitboard[4] = (bitboard[4] & ~(one_8 << (8 * 0))) | (clr3 << (8 * 0));
 
   return *this;
@@ -464,7 +465,8 @@ bool RubiksCubeBitboard::operator==(const RubiksCubeBitboard &r1) const {
   return true;
 }
 
-RubiksCubeBitboard &RubiksCubeBitboard::operator=(const RubiksCubeBitboard &r1) {
+RubiksCubeBitboard &
+RubiksCubeBitboard::operator=(const RubiksCubeBitboard &r1) {
   for (int i = 0; i < 6; i++) {
     bitboard[i] = r1.bitboard[i];
   }

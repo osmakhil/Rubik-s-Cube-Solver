@@ -1,6 +1,9 @@
 #include "EdgeDBmaker.hpp"
 #include <iostream>
 #include <vector>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 EdgeDBmaker::EdgeDBmaker(string _fileName, array<uint8_t, 6> _edges)
     : fileName(_fileName), edgeDB(_edges) {};
@@ -39,18 +42,31 @@ bool EdgeDBmaker::bfsAndStore() {
     nextLevel.clear();
     nextLevel.reserve(currentLevel.size() * 13); // ~13 moves after pruning
 
-    for (auto &[cube, lastMove] : currentLevel) {
-      for (int i = 0; i < 18; i++) {
-        // Pruning: skip if same face group as last move
-        // e.g. skip R' or R2 if last move was R
-        if (lastMove != -1 && (i / 3 == lastMove / 3))
-          continue;
+#pragma omp parallel
+    {
+      vector<pair<RubiksCubeBitboard, int8_t>> localNextLevel;
 
-        RubiksCubeBitboard next = cube;
-        next.move(RubiksCube::MOVE(i));
+#pragma omp for nowait
+      for (size_t idx = 0; idx < currentLevel.size(); ++idx) {
+        auto &[cube, lastMove] = currentLevel[idx];
+        for (int i = 0; i < 18; i++) {
+          // Pruning: skip if same face group as last move
+          // e.g. skip R' or R2 if last move was R
+          if (lastMove != -1 && (i / 3 == lastMove / 3))
+            continue;
 
-        if (edgeDB.setNumMoves(next, depth + 1))
-          nextLevel.push_back({next, i});
+          RubiksCubeBitboard next = cube;
+          next.move(RubiksCube::MOVE(i));
+
+          if (edgeDB.setNumMoves(next, depth + 1))
+            localNextLevel.push_back({next, i});
+        }
+      }
+
+#pragma omp critical
+      {
+        nextLevel.insert(nextLevel.end(), localNextLevel.begin(),
+                         localNextLevel.end());
       }
     }
 

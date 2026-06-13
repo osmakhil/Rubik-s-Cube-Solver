@@ -1,13 +1,12 @@
 #include "IDAStarSolver.hpp"
-#include "../Model/RubiksCube_3DArray.hpp"
 #include "../Model/RubiksCube_1DArray.hpp"
+#include "../Model/RubiksCube_3DArray.hpp"
 #include "../Model/RubiksCube_Bitboard.hpp"
-#include <queue>
 #include <algorithm>
 #include <cassert>
+#include <queue>
 
-template <typename T, typename H>
-void IDAstarSolver<T, H>::resetStructure() {
+template <typename T, typename H> void IDAstarSolver<T, H>::resetStructure() {
   moves.clear();
   move_done.clear();
   visited.clear();
@@ -16,8 +15,14 @@ void IDAstarSolver<T, H>::resetStructure() {
 template <typename T, typename H>
 std::pair<T, int> IDAstarSolver<T, H>::IDAstar(int bound) {
   //        priority_queue contains pair(Node, move done to reach that)
-  std::priority_queue<std::pair<Node, int>, std::vector<std::pair<Node, int>>, compareCube> pq;
-  Node start = Node(rubiksCube, 0, cornerDB.getNumMoves(rubiksCube));
+  std::priority_queue<std::pair<Node, int>, std::vector<std::pair<Node, int>>,
+                      compareCube>
+      pq;
+  Node start = Node(rubiksCube, 0,
+                    std::max({(int)cornerDB.getNumMoves(rubiksCube),
+                              (int)edgeDB1.getNumMoves(rubiksCube),
+                              (int)edgeDB2.getNumMoves(rubiksCube)}));
+
   pq.push(std::make_pair(start, 0));
   int next_bound = 100;
   while (!pq.empty()) {
@@ -38,7 +43,10 @@ std::pair<T, int> IDAstarSolver<T, H>::IDAstar(int bound) {
       auto curr_move = RubiksCube::MOVE(i);
       node.cube.move(curr_move);
       if (!visited[node.cube]) {
-        node.estimate = cornerDB.getNumMoves(node.cube);
+        node.estimate = std::max({(int)cornerDB.getNumMoves(node.cube),
+                                  (int)edgeDB1.getNumMoves(node.cube),
+                                  (int)edgeDB2.getNumMoves(node.cube)});
+
         if (node.estimate + node.depth > bound) {
           next_bound = std::min(next_bound, node.estimate + node.depth);
         } else {
@@ -52,9 +60,15 @@ std::pair<T, int> IDAstarSolver<T, H>::IDAstar(int bound) {
 }
 
 template <typename T, typename H>
-IDAstarSolver<T, H>::IDAstarSolver(T _rubiksCube, std::string fileName) {
+IDAstarSolver<T, H>::IDAstarSolver(T _rubiksCube,
+                                   std::string cornerDatabasePath,
+                                   std::string edgeDatabasePath1,
+                                   std::string edgeDatabasePath2)
+    : edgeDB1({0, 2, 4, 7, 8, 10}), edgeDB2({1, 3, 5, 6, 9, 11}) {
   rubiksCube = _rubiksCube;
-  cornerDB.fromFile(fileName);
+  cornerDB.fromFile(cornerDatabasePath);
+  edgeDB1.fromFile(edgeDatabasePath1);
+  edgeDB2.fromFile(edgeDatabasePath2);
 }
 
 template <typename T, typename H>

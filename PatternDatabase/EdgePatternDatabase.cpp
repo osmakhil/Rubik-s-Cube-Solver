@@ -22,5 +22,16 @@ uint32_t EdgePatternDatabase::getDatabaseIndex(const RubiksCube &cube) const
     for (int i = 0; i < 6; i++)
         orientNum = (orientNum << 1) | cube.getEdgeOrientation(trackedEdges[i]);
 
-    return rank * 64 + orientNum;
+    uint32_t index = rank * 64 + orientNum;
+    if (index >= 42577920) {
+        cout << "DEBUG: Out of bounds index = " << index 
+             << " | rank = " << rank 
+             << " | orientNum = " << orientNum << endl;
+        cout << "DEBUG: edgePerm = [ ";
+        for (int x : edgePerm) cout << x << " ";
+        cout << "]" << endl;
+        cout << "DEBUG: Invalid Cube State:" << endl;
+        cube.print();
+    }
+    return index;
 }
