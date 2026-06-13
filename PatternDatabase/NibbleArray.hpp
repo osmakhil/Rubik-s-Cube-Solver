@@ -18,6 +18,8 @@ public:
 
   void set(const size_t pos, const uint8_t val);
 
+  bool setNumMovesIfLess(const size_t pos, const uint8_t val);
+
   unsigned char *data();
 
   const unsigned char *data() const;

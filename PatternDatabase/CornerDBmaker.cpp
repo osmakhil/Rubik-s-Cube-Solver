@@ -9,10 +9,8 @@ CornerDBmaker::CornerDBmaker(string _fileName) : fileName(_fileName) {}
 CornerDBmaker::CornerDBmaker(string _fileName, uint8_t init_val)
     : fileName(_fileName), cornerDB(init_val) {}
 
-bool CornerDBmaker::bfsAndStore()
-{
-  if (cornerDB.fromFile(fileName))
-  {
+bool CornerDBmaker::bfsAndStore() {
+  if (cornerDB.fromFile(fileName)) {
     cout << "Loaded corner DB from file: " << fileName << "\n";
     return true;
   }
@@ -25,22 +23,18 @@ bool CornerDBmaker::bfsAndStore()
 
   uint8_t targetDepth = 11;
 
-  for (uint8_t depth = 0; depth < targetDepth; ++depth)
-  {
-    cout << "Depth " << (int)depth
-         << " | Frontier: " << currentLevel.size()
-         << " | DB filled: " << cornerDB.getNumItems()
-         << " / " << cornerDB.getSize() << "\n";
+  for (uint8_t depth = 0; depth < targetDepth; ++depth) {
+    cout << "Depth " << (int)depth << " | Frontier: " << currentLevel.size()
+         << " | DB filled: " << cornerDB.getNumItems() << " / "
+         << cornerDB.getSize() << "\n";
     cout.flush();
 
     // Reserve to avoid repeated heap reallocations
     nextLevel.clear();
     nextLevel.reserve(currentLevel.size() * 13);
 
-    for (auto &[cube, lastMove] : currentLevel)
-    {
-      for (int i = 0; i < 18; i++)
-      {
+    for (auto &[cube, lastMove] : currentLevel) {
+      for (int i = 0; i < 18; i++) {
         // Pruning: skip if same face group as last move
         if (lastMove != -1 && (i / 3 == lastMove / 3))
           continue;

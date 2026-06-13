@@ -3,6 +3,7 @@
 
 #include "../Model/RubiksCube.hpp"
 #include "NibbleArray.hpp"
+#include <atomic>
 
 using namespace std;
 
@@ -11,7 +12,7 @@ class PatternDatabase {
 private:
   NibbleArray database;
   size_t size;
-  size_t numItems;
+  atomic<size_t> numItems;
 
   PatternDatabase();
 

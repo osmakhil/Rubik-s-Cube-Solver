@@ -1,7 +1,7 @@
 #include "PatternDatabase.hpp"
+#include <atomic>
 #include <fstream>
 #include <string>
-
 using namespace std;
 
 PatternDatabase::PatternDatabase(const size_t size)
@@ -13,14 +13,8 @@ PatternDatabase::PatternDatabase(const size_t size, uint8_t init_val)
 // If the index is already set, it does nothing and returns false
 // Else it sets ind and returns true
 bool PatternDatabase::setNumMoves(const uint32_t ind, const uint8_t numMoves) {
-  uint8_t oldMoves = this->getNumMoves(ind);
-
-  //    New item is getting added
-  if (oldMoves == 0xF) {
+  if (this->database.setNumMovesIfLess(ind, numMoves)) {
     ++this->numItems;
-  }
-  if (oldMoves > numMoves) {
-    this->database.set(ind, numMoves);
     return true;
   }
   return false;

@@ -1,4 +1,5 @@
 #include "NibbleArray.hpp"
+#include <atomic>
 #include <cassert>
 using namespace std;
 
@@ -53,4 +54,29 @@ void NibbleArray::inflate(vector<uint8_t> &dest) const {
 // Reset the array
 void NibbleArray::reset(const uint8_t val) {
   fill(this->arr.begin(), this->arr.end(), val);
+}
+
+bool NibbleArray::setNumMovesIfLess(const size_t pos, const uint8_t val) {
+
+  size_t i = pos / 2;
+  assert(pos <= this->size);
+  auto *atomic_ptr = reinterpret_cast<std::atomic<uint8_t> *>(&this->arr[i]);
+  uint8_t currval = atomic_ptr->load(std::memory_order_relaxed);
+  uint8_t newval;
+  uint8_t old_nibble;
+  do {
+    if (pos % 2) {
+      old_nibble = currval & 0x0F;
+      if (old_nibble <= val)
+        return false;
+      newval = (currval & 0xF0) | (val & 0x0F);
+    } else {
+      old_nibble = currval >> 4;
+      if (old_nibble <= val)
+        return false;
+      newval = (currval & 0x0F) | (val << 4);
+    }
+  } while (!atomic_ptr->compare_exchange_weak(
+      currval, newval, std::memory_order_release, std::memory_order_relaxed));
+  return true;
 }
