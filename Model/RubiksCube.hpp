@@ -9,30 +9,12 @@ Rubik's cube Each one has it's own functionality and definitions. This class
 shared common functionality between models
 */
 
-class RubiksCube
-{
+class RubiksCube {
 
 public:
-  enum class FACE
-  {
-    UP,
-    LEFT,
-    FRONT,
-    RIGHT,
-    BACK,
-    DOWN
-  };
-  enum class COLOR
-  {
-    WHITE,
-    GREEN,
-    RED,
-    BLUE,
-    ORANGE,
-    YELLOW
-  };
-  enum class MOVE
-  {
+  enum class FACE { UP, LEFT, FRONT, RIGHT, BACK, DOWN };
+  enum class COLOR { WHITE, GREEN, RED, BLUE, ORANGE, YELLOW };
+  enum class MOVE {
     L,
     LPRIME,
     L2,
@@ -175,6 +157,9 @@ public:
   virtual RubiksCube &b2() = 0;
 
   string getCornerColorString(uint8_t ind) const;
+
+  void getCornerColors(uint8_t ind, COLOR &c_ud, COLOR &c_fb,
+                       COLOR &c_lr) const;
 
   uint8_t getCornerIndex(uint8_t ind) const;
 

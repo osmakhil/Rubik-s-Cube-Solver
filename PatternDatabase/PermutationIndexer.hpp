@@ -2,6 +2,7 @@
 #ifndef RUBIKS_CUBE_SOLVER_PERMUTATIONINDEXER_H
 #define RUBIKS_CUBE_SOLVER_PERMUTATIONINDEXER_H
 #include "Math.hpp"
+#include <bitset>
 #include <iostream>
 using namespace std;
 
